@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nryee-task3
+spec:
+  template:
+    spec:
+      containers:
+      - name: nryee-task3
+        image: pytorch/pytorch
+        command:
+        - sh
+        - -c
+        - "pip install torchvision matplotlib --break-system-packages && cd /pvcvolume && python3 cifar10train.py"
+        volumeMounts:
+        - name: pvcvolume
+          mountPath: /pvcvolume
+        resources:
+          limits:
+            memory: 8Gi
+            cpu: "4"
+            nvidia.com/gpu: 1
+          requests:
+            memory: 8Gi
+            cpu: "4"
+            nvidia.com/gpu: 1
+      volumes:
+      - name: pvcvolume
+        persistentVolumeClaim:
+          claimName: nryee-task3
+      restartPolicy: Never
+  backoffLimit: 2

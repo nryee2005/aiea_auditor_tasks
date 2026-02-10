@@ -1,0 +1,43 @@
+# image: nvidia/cuda:12.4.1-cudnn-devel-ubuntu20.04
+# image: nvidia/12.8.1-cudnn-devel-ubuntu20.04
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nryee-task3
+  labels:
+    k8s-app: nryee-task3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: nryee-task3
+  template:
+    metadata:
+      labels:
+        k8s-app: nryee-task3
+    spec:
+      containers:
+      - name: nryee-task3
+        image: nvidia/cuda:12.9.1-cudnn-devel-ubuntu24.04
+        resources:
+          limits:
+            memory: 8Gi
+            cpu: "4"
+            nvidia.com/gpu: 1
+          requests:
+            memory: 8Gi
+            cpu: "4"
+            nvidia.com/gpu: 1
+        command: [ "sh", "-c", "sleep infinity" ]
+        volumeMounts:
+        - mountPath: /pvcvolume
+          name: vol1
+      volumes:
+      - name: vol1
+        persistentVolumeClaim:
+          claimName: nryee-task3
+      tolerations:
+      - effect: NoSchedule
+        key: nautilus.io/gilpin-lab
+        operator: Exists
