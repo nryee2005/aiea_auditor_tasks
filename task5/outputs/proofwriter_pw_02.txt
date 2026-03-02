@@ -1,0 +1,15 @@
+
+========== PROOFWRITER | pw_02 ==========
+(expected: entailed)
+Logic-LM
+
+Task Description: Given a context and a question, determine whether the statement is entailed, contradicted, or unknown.
+
+Context:
+All people who regularly drink coffee are dependent on caffeine.
+
+Question:
+Someone who drinks coffee is dependent on caffeine.
+
+Answer choices: entailed / contradicted / unknown
+

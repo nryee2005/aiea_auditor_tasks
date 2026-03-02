@@ -1,0 +1,35 @@
+
+========== LOGICAL_DEDUCTION | logical_deduction_01 ==========
+Logic-LM
+
+Task Description: You are given a problem description. The task is to parse the problem as a constraint satisfaction problem, defining the domain, variables, and constraints.
+
+Context: Placeholder context (replace with real sample from paper if desired).
+
+Question: Placeholder question (replace with real sample from paper if desired).
+
+Options:
+  A) station_wagon is the second-newest
+  B) convertible is the second-newest
+  C) minivan is the second-newest
+
+Domain:
+  1: oldest
+  2: second-newest
+  3: newest
+
+Variables:
+  station_wagon in {1,2,3}
+  convertible in {1,2,3}
+  minivan in {1,2,3}
+
+Constraints:
+  station_wagon == 1 ::: The station wagon is the oldest
+  minivan > convertible ::: The minivan is newer than the convertible
+  AllDifferent(station_wagon, convertible, minivan) ::: All vehicles have different values
+
+Query:
+  A) station_wagon == 2
+  B) convertible == 2
+  C) minivan == 2
+

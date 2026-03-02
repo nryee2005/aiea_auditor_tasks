@@ -1,0 +1,11 @@
+--- Query 1: mother(lois, X) ---
+chris
+stewie
+meg
+--- Query 2: father(peter, X) ---
+chris
+stewie
+meg
+--- Query 3: brother(chris, X) ---
+stewie
+stewie

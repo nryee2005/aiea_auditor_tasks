@@ -1,0 +1,236 @@
+
+========== PROOFWRITER | pw_01 ==========
+(expected: unknown)
+
+Logic-LM
+
+Task Description: Given a context and a question, determine whether the statement is entailed, contradicted, or unknown.
+
+Context:
+Anne is quiet. Erin is furry. All red people are young.
+
+Question:
+Anne is white.
+
+Answer choices: entailed / contradicted / unknown
+
+
+[saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/proofwriter_pw_01.txt
+
+
+========== PROOFWRITER | pw_02 ==========
+(expected: entailed)
+
+Logic-LM
+
+Task Description: Given a context and a question, determine whether the statement is entailed, contradicted, or unknown.
+
+Context:
+All people who regularly drink coffee are dependent on caffeine.
+
+Question:
+Someone who drinks coffee is dependent on caffeine.
+
+Answer choices: entailed / contradicted / unknown
+
+
+[saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/proofwriter_pw_02.txt
+
+
+
+========== PRO_ONTO_QA | pro_onto_qa_01 ==========
+(expected: true)
+
+Logic-LM
+
+Task Description: You are given a problem description and a question. The task is to:
+1) define all the predicates in the problem
+2) parse the problem into logic rules based on the defined predicates
+3) write all the facts mentioned in the problem
+4) parse the question into the logic form
+
+Context: Every jompus is fruity. Every fruity thing is bright. Alex is a jompus.
+
+Question: Is Alex bright?
+
+Predicates:
+  Jompus(x, bool) ::: Does x belong to Jompus?
+  Zumpus(x, bool) ::: Does x belong to Zumpus?
+  Frutiy(x, bool) ::: Is x fruity?
+  Shy(x, bool) ::: Is x shy?
+  Dumpus(x, bool) ::: Is x a dumpus?
+  Rompus(x, bool) ::: Is x a rompous?
+
+Facts:
+  Zumpus(Alex, True)
+  Tumpus(Alex, True)  % (if you want to keep the exact screenshot word 'Tumpus')
+
+Rules:
+  Jompus(x, True) -> Frutiy(x, True)
+  Dumpus(x, True) -> Rompus(x, True)
+
+Query:
+  Shy(Alex, False)
+
+
+[saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/pro_onto_qa_pro_onto_qa_01.txt
+
+
+========== PRO_ONTO_QA | pro_onto_qa_02 ==========
+(expected: true)
+
+Logic-LM
+
+Task Description: You are given a problem description and a question. The task is to:
+1) define all the predicates in the problem
+2) parse the problem into logic rules based on the defined predicates
+3) write all the facts mentioned in the problem
+4) parse the question into the logic form
+
+Context: Every zumpus is shy. Every shy thing is a dumpus. Every dumpus is cold. Rex is a zumpus.
+
+Question: Is Rex cold?
+
+Predicates:
+  Jompus(x, bool) ::: Does x belong to Jompus?
+  Zumpus(x, bool) ::: Does x belong to Zumpus?
+  Frutiy(x, bool) ::: Is x fruity?
+  Shy(x, bool) ::: Is x shy?
+  Dumpus(x, bool) ::: Is x a dumpus?
+  Rompus(x, bool) ::: Is x a rompous?
+
+Facts:
+  Zumpus(Alex, True)
+  Tumpus(Alex, True)  % (if you want to keep the exact screenshot word 'Tumpus')
+
+Rules:
+  Jompus(x, True) -> Frutiy(x, True)
+  Dumpus(x, True) -> Rompus(x, True)
+
+Query:
+  Shy(Alex, False)
+
+
+[saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/pro_onto_qa_pro_onto_qa_02.txt
+
+
+
+========== FOLIO | folio_01 ==========
+
+Logic-LM
+
+Task Description: Given a problem description and a question, parse the problem and question into first-order logic formulas.
+The grammar of first-order logic is defined as follows:
+1) conjunction: expr1 ∧ expr2
+2) disjunction: expr1 ∨ expr2
+3) exclusive disjunction: expr1 ⊕ expr2
+4) negation: ¬expr1
+5) implication: expr1 → expr2
+6) iff: expr1 ↔ expr2
+7) universal quantifier: ∀x
+8) existential quantifier: ∃x
+Output format: logic form ::: description
+
+Context: Placeholder context (replace with real sample from paper if desired).
+
+Question: Placeholder question (replace with real sample from paper if desired).
+
+Predicates:
+  Dependent(x) ::: x is a person dependent on caffeine
+  Student(x) ::: x is a student
+  Drinks(x) ::: x regularly drinks coffee
+  Jokes(x) ::: x jokes about being addicted to caffeine
+  Unaware(x) ::: x is unaware that caffeine is a drug
+
+Premises:
+  ∀x (Drinks(x) → Dependent(x)) ::: All people who regularly drink coffee are dependent on caffeine
+  ∀x (Jokes(x) → ¬Unaware(x)) ::: No one who jokes about being addicted is unaware that caffeine is a drug
+  (¬Student(rina) → (Dependent(rina) ⊕ Student(rina))) ::: If Rina is not a student, then Rina is either dependent or a student, or neither
+
+Conclusion:
+  Jokes(rina) ⊕ Unaware(rina) ::: Rina either jokes about being addicted to caffeine or is unaware that caffeine is a drug
+
+
+[saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/folio_folio_01.txt
+
+
+
+========== LOGICAL_DEDUCTION | logical_deduction_01 ==========
+
+Logic-LM
+
+Task Description: You are given a problem description. The task is to parse the problem as a constraint satisfaction problem, defining the domain, variables, and constraints.
+
+Context: Placeholder context (replace with real sample from paper if desired).
+
+Question: Placeholder question (replace with real sample from paper if desired).
+
+Options:
+  A) station_wagon is the second-newest
+  B) convertible is the second-newest
+  C) minivan is the second-newest
+
+Domain:
+  1: oldest
+  2: second-newest
+  3: newest
+
+Variables:
+  station_wagon in {1,2,3}
+  convertible in {1,2,3}
+  minivan in {1,2,3}
+
+Constraints:
+  station_wagon == 1 ::: The station wagon is the oldest
+  minivan > convertible ::: The minivan is newer than the convertible
+  AllDifferent(station_wagon, convertible, minivan) ::: All vehicles have different values
+
+Query:
+  A) station_wagon == 2
+  B) convertible == 2
+  C) minivan == 2
+
+
+[saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/logical_deduction_logical_deduction_01.txt
+
+
+
+========== AR_LSAT | ar_lsat_01 ==========
+
+Logic-LM
+
+Task Description: You are given a problem description. The task is to parse the problem as a constraint satisfaction problem, defining the domain, variables, and constraints, then evaluate answer options.
+
+Context: Placeholder context (replace with real sample from paper if desired).
+
+Question: Placeholder question (replace with real sample from paper if desired).
+
+Options:
+  (A) Farber
+  (B) Gombarick
+  (C) Hall
+  (D) Kanze
+  (E) Lha
+
+Declarations:
+  stories = EnumSort([Romania, Spain, Tuscany])
+  assistants = EnumSort([photographer, writer])
+  assigned = Function([interns] -> [stories])
+  trained = Function([interns] -> [assistants])
+
+Constraints:
+  trained(Gombarick) == trained(Lha) ::: Gombarick and Lha trained in the same field
+  trained(Farber) != trained(Kanze) ::: Farber and Kanze trained in different fields
+  assigned(Jackson) == Tuscany ::: Jackson is assigned to Tuscany
+  assigned(Kanze) != Spain ::: Kanze is not assigned to Spain
+
+Options (Checks):
+  is_unsat(assigned(Farber) == Tuscany) ::: (A)
+  is_unsat(assigned(Gombarick) == Tuscany) ::: (B)
+  is_unsat(assigned(Hall) == Tuscany) ::: (C)
+  is_unsat(assigned(Kanze) == Tuscany) ::: (D)
+  is_unsat(assigned(Lha) == Tuscany) ::: (E)
+
+
+[saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/ar_lsat_ar_lsat_01.txt
+

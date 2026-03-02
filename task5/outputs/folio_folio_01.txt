@@ -1,0 +1,35 @@
+
+========== FOLIO | folio_01 ==========
+Logic-LM
+
+Task Description: Given a problem description and a question, parse the problem and question into first-order logic formulas.
+The grammar of first-order logic is defined as follows:
+1) conjunction: expr1 ∧ expr2
+2) disjunction: expr1 ∨ expr2
+3) exclusive disjunction: expr1 ⊕ expr2
+4) negation: ¬expr1
+5) implication: expr1 → expr2
+6) iff: expr1 ↔ expr2
+7) universal quantifier: ∀x
+8) existential quantifier: ∃x
+Output format: logic form ::: description
+
+Context: Placeholder context (replace with real sample from paper if desired).
+
+Question: Placeholder question (replace with real sample from paper if desired).
+
+Predicates:
+  Dependent(x) ::: x is a person dependent on caffeine
+  Student(x) ::: x is a student
+  Drinks(x) ::: x regularly drinks coffee
+  Jokes(x) ::: x jokes about being addicted to caffeine
+  Unaware(x) ::: x is unaware that caffeine is a drug
+
+Premises:
+  ∀x (Drinks(x) → Dependent(x)) ::: All people who regularly drink coffee are dependent on caffeine
+  ∀x (Jokes(x) → ¬Unaware(x)) ::: No one who jokes about being addicted is unaware that caffeine is a drug
+  (¬Student(rina) → (Dependent(rina) ⊕ Student(rina))) ::: If Rina is not a student, then Rina is either dependent or a student, or neither
+
+Conclusion:
+  Jokes(rina) ⊕ Unaware(rina) ::: Rina either jokes about being addicted to caffeine or is unaware that caffeine is a drug
+

@@ -1,0 +1,15 @@
+
+========== PROOFWRITER | pw_01 ==========
+(expected: unknown)
+Logic-LM
+
+Task Description: Given a context and a question, determine whether the statement is entailed, contradicted, or unknown.
+
+Context:
+Anne is quiet. Erin is furry. All red people are young.
+
+Question:
+Anne is white.
+
+Answer choices: entailed / contradicted / unknown
+

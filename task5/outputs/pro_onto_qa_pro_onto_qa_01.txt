@@ -1,0 +1,34 @@
+
+========== PRO_ONTO_QA | pro_onto_qa_01 ==========
+(expected: true)
+Logic-LM
+
+Task Description: You are given a problem description and a question. The task is to:
+1) define all the predicates in the problem
+2) parse the problem into logic rules based on the defined predicates
+3) write all the facts mentioned in the problem
+4) parse the question into the logic form
+
+Context: Every jompus is fruity. Every fruity thing is bright. Alex is a jompus.
+
+Question: Is Alex bright?
+
+Predicates:
+  Jompus(x, bool) ::: Does x belong to Jompus?
+  Zumpus(x, bool) ::: Does x belong to Zumpus?
+  Frutiy(x, bool) ::: Is x fruity?
+  Shy(x, bool) ::: Is x shy?
+  Dumpus(x, bool) ::: Is x a dumpus?
+  Rompus(x, bool) ::: Is x a rompous?
+
+Facts:
+  Zumpus(Alex, True)
+  Tumpus(Alex, True)  % (if you want to keep the exact screenshot word 'Tumpus')
+
+Rules:
+  Jompus(x, True) -> Frutiy(x, True)
+  Dumpus(x, True) -> Rompus(x, True)
+
+Query:
+  Shy(Alex, False)
+

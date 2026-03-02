@@ -1,0 +1,107 @@
+[
+  {
+    "id": "pw_01",
+    "context": "Anne is quiet. Erin is furry. All red people are young.",
+    "question": "Anne is white.",
+    "expected": "unknown",
+    "formatted_prompt": "Logic-LM\n\nTask Description: Given a context and a question, determine whether the statement is entailed, contradicted, or unknown.\n\nContext:\nAnne is quiet. Erin is furry. All red people are young.\n\nQuestion:\nAnne is white.\n\nAnswer choices: entailed / contradicted / unknown\n",
+    "attempts": [
+      {
+        "attempt": 1,
+        "program": "is_quiet(anne).\nis_furry(erin).\nis_red(X) :- is_young(X).\n\nis_young(X) :- is_red(X).\n\nis_white(anne).\n\n:- (is_white(anne) -> (entailed) ; (contradicted)), halt.",
+        "success": false,
+        "stdout": "",
+        "stderr": "Execution timed out (10s)"
+      },
+      {
+        "attempt": 2,
+        "program": "is_quiet(anne).\nis_furry(erin).\nis_red(X) :- is_young(X).\n\nis_young(X) :- is_red(X).\n\nis_white(anne).\n\n:- (is_white(anne), \\+ is_red(anne) -> (entailed) ; (contradicted)), halt.",
+        "success": false,
+        "stdout": "",
+        "stderr": "Execution timed out (10s)"
+      },
+      {
+        "attempt": 3,
+        "program": "is_quiet(anne).\nis_furry(erin).\nis_red(X) :- is_young(X).\n\nis_young(X) :- is_red(X).\n\nis_white(anne).\n\n:- (is_white(anne), \\+ is_red(anne) -> (entailed) ; (contradicted)), halt.",
+        "success": false,
+        "stdout": "",
+        "stderr": "Execution timed out (10s)"
+      }
+    ],
+    "final_answer": "",
+    "correct": false,
+    "num_attempts": 3,
+    "refined": true,
+    "dataset": "proofwriter"
+  },
+  {
+    "id": "pw_02",
+    "context": "All people who regularly drink coffee are dependent on caffeine.",
+    "question": "Someone who drinks coffee is dependent on caffeine.",
+    "expected": "entailed",
+    "formatted_prompt": "Logic-LM\n\nTask Description: Given a context and a question, determine whether the statement is entailed, contradicted, or unknown.\n\nContext:\nAll people who regularly drink coffee are dependent on caffeine.\n\nQuestion:\nSomeone who drinks coffee is dependent on caffeine.\n\nAnswer choices: entailed / contradicted / unknown\n",
+    "attempts": [
+      {
+        "attempt": 1,
+        "program": "dependent_on_caffeine(john).\ndependent_on_caffeine(sarah).\ndependent_on_caffeine(mike).\n\ndrinks_coffee(john).\ndrinks_coffee(sarah).\n\n:- (drinks_coffee(X), \\+ dependent_on_caffeine(X) -> write('contradicted') ; write('entailed')).\n:- halt.",
+        "success": true,
+        "stdout": "entailed",
+        "stderr": ""
+      }
+    ],
+    "final_answer": "entailed",
+    "correct": true,
+    "num_attempts": 1,
+    "refined": false,
+    "dataset": "proofwriter"
+  },
+  {
+    "id": "pro_onto_qa_01",
+    "context": "Every jompus is fruity. Every fruity thing is bright. Alex is a jompus.",
+    "question": "Is Alex bright?",
+    "expected": "true",
+    "formatted_prompt": "Logic-LM\n\nTask Description: You are given a problem description and a question. The task is to:\n1) define all the predicates in the problem\n2) parse the problem into logic rules based on the defined predicates\n3) write all the facts mentioned in the problem\n4) parse the question into the logic form\n\nContext: Every jompus is fruity. Every fruity thing is bright. Alex is a jompus.\n\nQuestion: Is Alex bright?\n\nPredicates:\n  Jompus(x, bool) ::: Does x belong to Jompus?\n  Zumpus(x, bool) ::: Does x belong to Zumpus?\n  Frutiy(x, bool) ::: Is x fruity?\n  Shy(x, bool) ::: Is x shy?\n  Dumpus(x, bool) ::: Is x a dumpus?\n  Rompus(x, bool) ::: Is x a rompous?\n\nFacts:\n  Zumpus(Alex, True)\n  Tumpus(Alex, True)  % (if you want to keep the exact screenshot word 'Tumpus')\n\nRules:\n  Jompus(x, True) -> Frutiy(x, True)\n  Dumpus(x, True) -> Rompus(x, True)\n\nQuery:\n  Shy(Alex, False)\n",
+    "attempts": [
+      {
+        "attempt": 1,
+        "program": "jompus(alex).\nfruity(X) :- jompus(X).\nbright(X) :- fruity(X).\n\n:- bright(alex).\n:- halt.",
+        "success": true,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "attempt": 2,
+        "program": "jompus(alex).\nfruity(X) :- jompus(X).\nbright(X) :- fruity(X).\n\n:- bright(alex), write('yes'), nl.\n:- halt.",
+        "success": true,
+        "stdout": "yes",
+        "stderr": ""
+      }
+    ],
+    "final_answer": "yes",
+    "correct": true,
+    "num_attempts": 2,
+    "refined": true,
+    "dataset": "pro_onto_qa"
+  },
+  {
+    "id": "pro_onto_qa_02",
+    "context": "Every zumpus is shy. Every shy thing is a dumpus. Every dumpus is cold. Rex is a zumpus.",
+    "question": "Is Rex cold?",
+    "expected": "true",
+    "formatted_prompt": "Logic-LM\n\nTask Description: You are given a problem description and a question. The task is to:\n1) define all the predicates in the problem\n2) parse the problem into logic rules based on the defined predicates\n3) write all the facts mentioned in the problem\n4) parse the question into the logic form\n\nContext: Every zumpus is shy. Every shy thing is a dumpus. Every dumpus is cold. Rex is a zumpus.\n\nQuestion: Is Rex cold?\n\nPredicates:\n  Jompus(x, bool) ::: Does x belong to Jompus?\n  Zumpus(x, bool) ::: Does x belong to Zumpus?\n  Frutiy(x, bool) ::: Is x fruity?\n  Shy(x, bool) ::: Is x shy?\n  Dumpus(x, bool) ::: Is x a dumpus?\n  Rompus(x, bool) ::: Is x a rompous?\n\nFacts:\n  Zumpus(Alex, True)\n  Tumpus(Alex, True)  % (if you want to keep the exact screenshot word 'Tumpus')\n\nRules:\n  Jompus(x, True) -> Frutiy(x, True)\n  Dumpus(x, True) -> Rompus(x, True)\n\nQuery:\n  Shy(Alex, False)\n",
+    "attempts": [
+      {
+        "attempt": 1,
+        "program": "is_cold(rex).\n\nis_zumpus(rex).\n\nis_shy(X) :- is_zumpus(X).\n\nis_dumpus(X) :- is_shy(X).\n\nis_cold(X) :- is_dumpus(X).\n\n:- is_cold(rex), write(true), nl.\n:- halt.",
+        "success": true,
+        "stdout": "true",
+        "stderr": "Warning: /var/folders/p7/kh4gpljn1hs6493wkfdskvh00000gn/T/tmp8uxlt8xi.pl:9:\nWarning:    Clauses of is_cold/1 are not together in the source-file\nWarning:    Earlier definition at /var/folders/p7/kh4gpljn1hs6493wkfdskvh00000gn/T/tmp8uxlt8xi.pl:1\nWarning:    Current predicate: is_dumpus/1\nWarning:    Use :- discontiguous is_cold/1. to suppress this message"
+      }
+    ],
+    "final_answer": "true",
+    "correct": true,
+    "num_attempts": 1,
+    "refined": false,
+    "dataset": "pro_onto_qa"
+  }
+]
