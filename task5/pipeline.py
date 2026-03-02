@@ -1,26 +1,15 @@
-"""
-Logic-LM pipeline: prompt → LLM translates to Prolog → execute via swipl → self-refine → compare.
-
-Supports ProofWriter and PrOntoQA datasets.
-"""
-from __future__ import annotations
-
-import json
 import re
 import subprocess
 import tempfile
-from pathlib import Path
-from typing import Any, Dict
+import os
 
 import openai
 
 
-# ---------------------------------------------------------------------------
-# LLM helpers
-# ---------------------------------------------------------------------------
+# --- LLM calls ---
 
-def call_llm(system_prompt: str, user_prompt: str) -> str:
-    """Thin wrapper around the OpenAI chat completions API."""
+def call_llm(system_prompt, user_prompt):
+    # Send a chat completion request to GPT
     client = openai.OpenAI()
     response = client.chat.completions.create(
         model="gpt-3.5-turbo",
@@ -33,10 +22,18 @@ def call_llm(system_prompt: str, user_prompt: str) -> str:
     return response.choices[0].message.content.strip()
 
 
-TRANSLATE_SYSTEM = """\
+def strip_fences(raw):
+    # Remove markdown code fences that GPT sometimes adds
+    raw = re.sub(r"^```(?:prolog)?\s*", "", raw, flags=re.MULTILINE)
+    raw = re.sub(r"^```\s*$", "", raw, flags=re.MULTILINE)
+    return raw.strip()
+
+
+# System prompt for translating natural language to Prolog
+TRANSLATE_PROMPT = """\
 You are an expert logic programmer. Given a natural-language logic problem \
-(context + question + answer format), produce a **complete, self-contained \
-SWI-Prolog program**.
+(context + question + answer format), produce a complete, self-contained \
+SWI-Prolog program.
 
 STRICT RULES for SWI-Prolog:
 - Declare facts and rules as normal clauses.
@@ -48,87 +45,57 @@ STRICT RULES for SWI-Prolog:
 
 Output ONLY the Prolog code. No explanation."""
 
-
-def _strip_fences(raw: str) -> str:
-    """Remove markdown code fences from LLM output."""
-    raw = re.sub(r"^```(?:prolog)?\s*", "", raw, flags=re.MULTILINE)
-    raw = re.sub(r"^```\s*$", "", raw, flags=re.MULTILINE)
-    return raw.strip()
-
-
-# Answer format hints per dataset type
+# What answer format to tell GPT about for each dataset
 ANSWER_FORMATS = {
     "proofwriter": "Print exactly one of: entailed, contradicted, or unknown",
     "pro_onto_qa": "Print exactly one of: true or false",
 }
 
 
-def translate_to_prolog(context: str, question: str, dataset: str = "") -> str:
-    """Ask GPT to translate a logic problem into a SWI-Prolog program."""
+def translate_to_prolog(context, question, dataset=""):
+    # Ask GPT to turn a logic problem into a Prolog program
     answer_hint = ANSWER_FORMATS.get(dataset, "Print exactly one of: true or false")
     user_prompt = (
         f"Context:\n{context}\n\n"
         f"Question:\n{question}\n\n"
         f"Answer format: {answer_hint}"
     )
-    raw = call_llm(TRANSLATE_SYSTEM, user_prompt)
-    return _strip_fences(raw)
+    raw = call_llm(TRANSLATE_PROMPT, user_prompt)
+    return strip_fences(raw)
 
 
-# ---------------------------------------------------------------------------
-# Prolog execution
-# ---------------------------------------------------------------------------
+# --- Prolog execution ---
 
-def run_prolog_program(program: str) -> Dict[str, Any]:
-    """Write *program* to a temp file and execute it with swipl.
-
-    Returns dict with keys: success (bool), stdout (str), stderr (str).
-    """
-    with tempfile.NamedTemporaryFile(
-        mode="w", suffix=".pl", delete=False
-    ) as tmp:
-        tmp.write(program)
-        tmp_path = tmp.name
+def run_prolog(program):
+    # Write program to a temp file and run it with swipl
+    tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".pl", delete=False)
+    tmp.write(program)
+    tmp.close()
 
     try:
         result = subprocess.run(
-            ["swipl", "-q", tmp_path],
-            capture_output=True,
-            text=True,
-            timeout=10,
+            ["swipl", "-q", tmp.name],
+            capture_output=True, text=True, timeout=10,
         )
         stderr = result.stderr.strip()
         stdout = result.stdout.strip()
-        # Treat as failure if returncode != 0, or if stderr has ERROR
-        # (swipl can return 0 even when directives fail)
+
+        # swipl can return 0 even when directives fail, so check for ERROR in stderr
         has_error = "ERROR:" in stderr
         success = result.returncode == 0 and not has_error
-        return {
-            "success": success,
-            "stdout": stdout,
-            "stderr": stderr,
-        }
+
+        return {"success": success, "stdout": stdout, "stderr": stderr}
     except FileNotFoundError:
-        return {
-            "success": False,
-            "stdout": "",
-            "stderr": "swipl not found on PATH",
-        }
+        return {"success": False, "stdout": "", "stderr": "swipl not found on PATH"}
     except subprocess.TimeoutExpired:
-        return {
-            "success": False,
-            "stdout": "",
-            "stderr": "Execution timed out (10s)",
-        }
+        return {"success": False, "stdout": "", "stderr": "Execution timed out (10s)"}
     finally:
-        Path(tmp_path).unlink(missing_ok=True)
+        os.unlink(tmp.name)
 
 
-# ---------------------------------------------------------------------------
-# Self-refinement
-# ---------------------------------------------------------------------------
+# --- Self-refinement ---
 
-REFINE_SYSTEM = """\
+REFINE_PROMPT = """\
 You are an expert Prolog debugger. The user will give you:
 - The original logic problem (context + question)
 - A Prolog program that failed
@@ -142,46 +109,41 @@ STRICT RULES for SWI-Prolog:
 
 Produce a CORRECTED, complete SWI-Prolog program. Output ONLY the Prolog code."""
 
-def refine_prolog(program: str, error: str, context: str, question: str) -> str:
-    """Ask GPT to fix a failing Prolog program."""
+
+def refine_prolog(program, error, context, question):
+    # Send the failing program + error back to GPT to get a fix
     user_prompt = (
         f"Context:\n{context}\n\n"
         f"Question:\n{question}\n\n"
         f"Failing program:\n```prolog\n{program}\n```\n\n"
         f"Error:\n{error}"
     )
-    raw = call_llm(REFINE_SYSTEM, user_prompt)
-    return _strip_fences(raw)
+    raw = call_llm(REFINE_PROMPT, user_prompt)
+    return strip_fences(raw)
 
 
-# ---------------------------------------------------------------------------
-# Answer interpretation
-# ---------------------------------------------------------------------------
+# --- Answer comparison ---
 
-def interpret_result(stdout: str, expected: str | None) -> Dict[str, Any]:
-    """Normalize Prolog output and compare with expected answer."""
+def interpret_result(stdout, expected):
+    # Compare prolog output against expected answer
     raw_answer = stdout.strip().lower()
     if expected is None:
         return {"answer": raw_answer, "expected": None, "correct": None}
 
     norm_expected = expected.strip().lower()
 
-    # Keyword sets for canonicalization
-    true_words = {"true", "yes", "entailed"}
-    false_words = {"false", "no", "contradicted"}
-    unknown_words = {"unknown", "neither"}
-
-    def canonicalize(val: str) -> str:
-        """Try exact match first, then search for keywords in longer strings."""
+    def canonicalize(val):
         val = val.strip().rstrip(".")
-        # Exact match
-        if val in true_words:
+
+        # Exact match against known answer words
+        if val in ("true", "yes", "entailed"):
             return "true"
-        if val in false_words:
+        if val in ("false", "no", "contradicted"):
             return "false"
-        if val in unknown_words:
+        if val in ("unknown", "neither"):
             return "unknown"
-        # Keyword search in longer output (e.g. "Yes, alex is bright.")
+
+        # Search for keywords in longer output (e.g. "Yes, alex is bright.")
         words = set(re.findall(r"[a-z]+", val))
         for w in ("entailed", "true", "yes"):
             if w in words:
@@ -194,50 +156,35 @@ def interpret_result(stdout: str, expected: str | None) -> Dict[str, Any]:
                 return "unknown"
         return val
 
-    canon_answer = canonicalize(raw_answer)
-    canon_expected = canonicalize(norm_expected)
-
     return {
         "answer": raw_answer,
         "expected": expected,
-        "correct": canon_answer == canon_expected,
+        "correct": canonicalize(raw_answer) == canonicalize(norm_expected),
     }
 
 
-# ---------------------------------------------------------------------------
-# Main pipeline orchestrator
-# ---------------------------------------------------------------------------
+# --- Main pipeline for one problem ---
 
-def run_pipeline_item(item: Dict[str, Any], mod: Any, dataset: str = "") -> Dict[str, Any]:
-    """Run the full pipeline for a single problem item.
-
-    Steps:
-      1. Format the prompt for display (via existing format_one)
-      2. Translate to Prolog
-      3. Execute Prolog
-      4. Self-refine up to 3 times on failure
-      5. Interpret and compare answer
-    """
-    # Lazy import to avoid circular deps
+def run_pipeline_item(item, mod, dataset=""):
+    # Import here to avoid circular import
     from run_prompts import format_one
 
     context = item.get("context", "")
     question = item.get("question", "")
     expected = item.get("expected")
 
-    # 1. Format for display
+    # Format prompt for display
     formatted_prompt = format_one(mod, item)
 
-    # 2. Translate to Prolog
+    # Translate to Prolog
     program = translate_to_prolog(context, question, dataset=dataset)
 
-    # 3-4. Execute with up to 3 refinement attempts
+    # Execute with up to 3 refinement attempts
     max_attempts = 3
     attempts = []
-    exec_result = None
 
     for attempt in range(1, max_attempts + 1):
-        exec_result = run_prolog_program(program)
+        exec_result = run_prolog(program)
         attempts.append({
             "attempt": attempt,
             "program": program,
@@ -246,19 +193,21 @@ def run_pipeline_item(item: Dict[str, Any], mod: Any, dataset: str = "") -> Dict
             "stderr": exec_result["stderr"],
         })
 
+        # If it worked and produced output, we're done
         if exec_result["success"] and exec_result["stdout"]:
             break
 
-        # Build error message for refinement
+        # Figure out what went wrong for the refinement prompt
         if not exec_result["success"]:
             error_msg = exec_result["stderr"] or "Program returned non-zero exit code"
         else:
             error_msg = "Program produced no output"
 
+        # Try to fix it (unless we're out of attempts)
         if attempt < max_attempts:
             program = refine_prolog(program, error_msg, context, question)
 
-    # 5. Interpret result
+    # Compare final output to expected answer
     final_stdout = exec_result["stdout"] if exec_result else ""
     comparison = interpret_result(final_stdout, expected)
 

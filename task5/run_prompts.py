@@ -1,117 +1,92 @@
-from __future__ import annotations
 import argparse
 import importlib.util
-from pathlib import Path
-from typing import Any, Dict, List
+import os
 
-PROMPTS_DIR = Path(__file__).parent / "prompts"
-OUT_DIR = Path(__file__).parent / "outputs"
+prompts_dir = os.path.join(os.path.dirname(__file__), "prompts")
+out_dir = os.path.join(os.path.dirname(__file__), "outputs")
 
 
-def load_module(module_name: str):
-    # Load prompts/<module_name>.py as a Python module, even if prompts is not a package.
-    module_path = PROMPTS_DIR / f"{module_name}.py"
-    if not module_path.exists():
-        raise FileNotFoundError(f"Could not find {module_path}")
+def load_module(name):
+    # Dynamically load prompts/<name>.py as a module
+    path = os.path.join(prompts_dir, f"{name}.py")
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Could not find {path}")
 
-    spec = importlib.util.spec_from_file_location(module_name, str(module_path))
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Failed to create import spec for {module_path}")
-
+    spec = importlib.util.spec_from_file_location(name, path)
     mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)  # type: ignore
+    spec.loader.exec_module(mod)
     return mod
 
 
-def ensure_out_dir():
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def get_prompt_items(mod) -> List[Dict[str, Any]]:
-    """
-    Priority:
-      1) PROMPTS (list of dicts) if present
-      2) get_prompts() if present and returns list
-      3) else make ONE default prompt using build_problem/render with placeholder context/question
-    """
-    if hasattr(mod, "PROMPTS"):
-        prompts = getattr(mod, "PROMPTS")
-        if isinstance(prompts, list) and len(prompts) > 0:
-            return prompts
+def get_prompt_items(mod):
+    # Try PROMPTS list first, then get_prompts(), then a placeholder
+    if hasattr(mod, "PROMPTS") and len(mod.PROMPTS) > 0:
+        return mod.PROMPTS
 
     if hasattr(mod, "get_prompts"):
         prompts = mod.get_prompts()
         if isinstance(prompts, list) and len(prompts) > 0:
             return prompts
 
-    # Fallback: create a single item for build_problem/render modules
+    # Fallback placeholder
+    name = getattr(mod, "NAME", mod.__name__)
     return [{
-        "id": f"{getattr(mod, 'NAME', mod.__name__)}_01",
+        "id": f"{name}_01",
         "context": "Placeholder context (replace with real sample from paper if desired).",
         "question": "Placeholder question (replace with real sample from paper if desired).",
         "expected": None,
     }]
 
 
-def format_one(mod, item: Dict[str, Any]) -> str:
-    """
-    Try common interfaces:
-      - render(build_problem(context, question))
-      - format_prompt(context, question)
-      - build_problem(context, question) (as dict) then pretty print
-    """
+def format_one(mod, item):
+    # Try different formatting interfaces that prompt modules can have
     context = item.get("context", "")
     question = item.get("question", "")
 
-    # Preferred: build_problem + render (what your folio/ar_lsat/etc. have)
+    # build_problem + render (used by pro_onto_qa, folio, ar_lsat, logical_deduction)
     if hasattr(mod, "build_problem") and hasattr(mod, "render"):
         prob = mod.build_problem(context, question)
         return mod.render(prob)
 
-    # Next: format_prompt (your proofwriter has this)
+    # format_prompt (used by proofwriter)
     if hasattr(mod, "format_prompt"):
         return mod.format_prompt(context, question)
 
-    # Last resort: build_problem only
+    # build_problem only, just print the dict
     if hasattr(mod, "build_problem"):
-        prob = mod.build_problem(context, question)
-        return str(prob)
+        return str(mod.build_problem(context, question))
 
-    raise AttributeError(
-        f"{mod.__name__} has no known formatting interface. "
-        f"Expected build_problem+render OR format_prompt OR build_problem."
-    )
+    raise AttributeError(f"{mod.__name__} has no known formatting interface")
 
 
-def main():
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("name", help="Prompt module name (e.g., proofwriter, folio, logical_deduction, pro_onto_qa, al_lsat)")
-    parser.add_argument("--all", action="store_true", help="Run all prompts found in PROMPTS/get_prompts() instead of just the first.")
+    parser.add_argument("name", help="Dataset module name (e.g. proofwriter, pro_onto_qa)")
+    parser.add_argument("--all", action="store_true", help="Run all prompts, not just the first")
     args = parser.parse_args()
 
-    ensure_out_dir()
+    os.makedirs(out_dir, exist_ok=True)
     mod = load_module(args.name)
-
     items = get_prompt_items(mod)
+
     if not args.all:
         items = items[:1]
 
     for item in items:
         pid = item.get("id", "unknown")
-        out_text = format_one(mod, item)
+        text = format_one(mod, item)
 
+        # Print with header
         header = f"\n========== {args.name.upper()} | {pid} ==========\n"
         expected = item.get("expected")
         if expected is not None:
             header += f"(expected: {expected})\n"
 
         print(header)
-        print(out_text)
+        print(text)
 
-        out_file = OUT_DIR / f"{args.name}_{pid}.txt"
-        out_file.write_text(header + out_text + "\n", encoding="utf-8")
+        # Save to file
+        out_file = os.path.join(out_dir, f"{args.name}_{pid}.txt")
+        with open(out_file, "w") as f:
+            f.write(header + text + "\n")
         print(f"\n[saved] {out_file}\n")
-
-
-if __name__ == "__main__":
-    main()

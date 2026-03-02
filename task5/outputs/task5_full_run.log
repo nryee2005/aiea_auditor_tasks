@@ -1,9 +1,6 @@
-=== Task 5 Runner: KB tests + Prompt demo ===
+=== Task 5: KB Tests + Prompt Demo ===
 
 Running SWI-Prolog KB tests...
-
---- saved SWI-Prolog results to: /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/swipl_kb_results.txt ---
-
 --- Query 1: mother(lois, X) ---
 chris
 stewie
@@ -16,10 +13,9 @@ meg
 stewie
 stewie
 
+Saved to /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/swipl_kb_results.txt
 
-Running prompt formatting demo (run_prompts.py)...
-
-$ /Users/nyee/projects/school/aiea/aiea_auditor_tasks/venv/bin/python /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/run_prompts.py proofwriter --all
+Running prompt formatting for all datasets...
 
 ========== PROOFWRITER | pw_01 ==========
 (expected: unknown)
@@ -60,8 +56,6 @@ Answer choices: entailed / contradicted / unknown
 
 
 
-$ /Users/nyee/projects/school/aiea/aiea_auditor_tasks/venv/bin/python /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/run_prompts.py pro_onto_qa --all
-
 ========== PRO_ONTO_QA | pro_onto_qa_01 ==========
 (expected: true)
 
@@ -87,7 +81,7 @@ Predicates:
 
 Facts:
   Zumpus(Alex, True)
-  Tumpus(Alex, True)  % (if you want to keep the exact screenshot word 'Tumpus')
+  Tumpus(Alex, True)
 
 Rules:
   Jompus(x, True) -> Frutiy(x, True)
@@ -125,7 +119,7 @@ Predicates:
 
 Facts:
   Zumpus(Alex, True)
-  Tumpus(Alex, True)  % (if you want to keep the exact screenshot word 'Tumpus')
+  Tumpus(Alex, True)
 
 Rules:
   Jompus(x, True) -> Frutiy(x, True)
@@ -138,8 +132,6 @@ Query:
 [saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/pro_onto_qa_pro_onto_qa_02.txt
 
 
-
-$ /Users/nyee/projects/school/aiea/aiea_auditor_tasks/venv/bin/python /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/run_prompts.py folio --all
 
 ========== FOLIO | folio_01 ==========
 
@@ -181,8 +173,6 @@ Conclusion:
 
 
 
-$ /Users/nyee/projects/school/aiea/aiea_auditor_tasks/venv/bin/python /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/run_prompts.py logical_deduction --all
-
 ========== LOGICAL_DEDUCTION | logical_deduction_01 ==========
 
 Logic-LM
@@ -222,8 +212,6 @@ Query:
 [saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/logical_deduction_logical_deduction_01.txt
 
 
-
-$ /Users/nyee/projects/school/aiea/aiea_auditor_tasks/venv/bin/python /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/run_prompts.py ar_lsat --all
 
 ========== AR_LSAT | ar_lsat_01 ==========
 
@@ -265,9 +253,6 @@ Options (Checks):
 [saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/ar_lsat_ar_lsat_01.txt
 
 
+Saved to /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/prompts_output.txt
 
---- saved output to: /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/prompts_output.txt ---
-
- Done.
-- SWI-Prolog KB results: /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/swipl_kb_results.txt
-- Prompt outputs:        /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/prompts_output.txt
+Done.

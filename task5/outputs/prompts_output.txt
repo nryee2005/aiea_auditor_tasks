@@ -63,7 +63,7 @@ Predicates:
 
 Facts:
   Zumpus(Alex, True)
-  Tumpus(Alex, True)  % (if you want to keep the exact screenshot word 'Tumpus')
+  Tumpus(Alex, True)
 
 Rules:
   Jompus(x, True) -> Frutiy(x, True)
@@ -101,7 +101,7 @@ Predicates:
 
 Facts:
   Zumpus(Alex, True)
-  Tumpus(Alex, True)  % (if you want to keep the exact screenshot word 'Tumpus')
+  Tumpus(Alex, True)
 
 Rules:
   Jompus(x, True) -> Frutiy(x, True)

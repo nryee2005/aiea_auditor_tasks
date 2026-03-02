@@ -1,37 +1,31 @@
-def build_problem(context: str, question: str):
-    # Very small toy mapping just to show the format
-    predicates = [
-        "Quiet(x): x is quiet",
-        "Furry(x): x is furry",
-        "Young(x): x is young",
-        "White(x): x is white",
-        "Red(x): x is red",
-    ]
-    facts = [
-        "Quiet(Anne) = True",
-        "White(Harry) = True",
-    ]
-    rules = [
-        "Young(x) -> Furry(x)",
-        "Red(x) -> Young(x)"
-    ]
-    query = "White(Anne) = True"
+NAME = "proofwriter"
+
+# Example predicates/facts/rules to show the Logic-LM format
+def build_problem(context, question):
     return {
         "dataset": "ProofWriter",
         "context": context,
         "question": question,
-        "predicates": predicates,
-        "facts": facts,
-        "rules": rules,
-        "query": query,
+        "predicates": [
+            "Quiet(x): x is quiet",
+            "Furry(x): x is furry",
+            "Young(x): x is young",
+            "White(x): x is white",
+            "Red(x): x is red",
+        ],
+        "facts": [
+            "Quiet(Anne) = True",
+            "White(Harry) = True",
+        ],
+        "rules": [
+            "Young(x) -> Furry(x)",
+            "Red(x) -> Young(x)",
+        ],
+        "query": "White(Anne) = True",
     }
 
 
-# prompts/proofwriter.py
-NAME = "proofwriter"
-DESCRIPTION = "Logic-LM prompt formatting for ProofWriter-style entailment tasks."
-
-def format_prompt(context: str, question: str) -> str:
+def format_prompt(context, question):
     return f"""Logic-LM
 
 Task Description: Given a context and a question, determine whether the statement is entailed, contradicted, or unknown.
@@ -45,7 +39,8 @@ Question:
 Answer choices: entailed / contradicted / unknown
 """
 
-# This is what run_prompts.py is complaining it cannot find
+
+# Sample problems for ProofWriter
 PROMPTS = [
     {
         "id": "pw_01",
@@ -60,7 +55,3 @@ PROMPTS = [
         "expected": "entailed",
     },
 ]
-
-def get_prompts():
-    # Optional: some runners accept this too; safe to include.
-    return PROMPTS
