@@ -2,12 +2,13 @@ import argparse
 import importlib.util
 import os
 
+# Set prompts and output directories
 prompts_dir = os.path.join(os.path.dirname(__file__), "prompts")
 out_dir = os.path.join(os.path.dirname(__file__), "outputs")
 
 
 def load_module(name):
-    # Dynamically load prompts/<name>.py as a module
+    # Dynamically load prompts/<name>.py as a module rather than normal import
     path = os.path.join(prompts_dir, f"{name}.py")
     if not os.path.exists(path):
         raise FileNotFoundError(f"Could not find {path}")
@@ -15,11 +16,11 @@ def load_module(name):
     spec = importlib.util.spec_from_file_location(name, path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
-    return mod
+    return mod # Returns module
 
 
 def get_prompt_items(mod):
-    # Try PROMPTS list first, then get_prompts(), then a placeholder
+    # Try PROMPTS list first, then get_prompts(), then a placeholder for module
     if hasattr(mod, "PROMPTS") and len(mod.PROMPTS) > 0:
         return mod.PROMPTS
 
@@ -28,7 +29,7 @@ def get_prompt_items(mod):
         if isinstance(prompts, list) and len(prompts) > 0:
             return prompts
 
-    # Fallback placeholder
+    # Fallback placeholder if prompt mod doesn't have above attributes
     name = getattr(mod, "NAME", mod.__name__)
     return [{
         "id": f"{name}_01",
@@ -60,6 +61,7 @@ def format_one(mod, item):
 
 
 if __name__ == "__main__":
+    # Parse command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument("name", help="Dataset module name (e.g. proofwriter, pro_onto_qa)")
     parser.add_argument("--all", action="store_true", help="Run all prompts, not just the first")
@@ -77,7 +79,7 @@ if __name__ == "__main__":
         text = format_one(mod, item)
 
         # Print with header
-        header = f"\n========== {args.name.upper()} | {pid} ==========\n"
+        header = f"\n{args.name.upper()} | {pid}\n"
         expected = item.get("expected")
         if expected is not None:
             header += f"(expected: {expected})\n"

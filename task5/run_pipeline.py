@@ -2,7 +2,6 @@ import json
 import os
 import sys
 
-# Allow importing sibling modules when run from task5/
 sys.path.insert(0, os.path.dirname(__file__))
 
 # Load .env if python-dotenv is available

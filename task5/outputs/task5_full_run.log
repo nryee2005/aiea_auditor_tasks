@@ -17,7 +17,7 @@ Saved to /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/swipl
 
 Running prompt formatting for all datasets...
 
-========== PROOFWRITER | pw_01 ==========
+PROOFWRITER | pw_01
 (expected: unknown)
 
 Logic-LM
@@ -36,7 +36,7 @@ Answer choices: entailed / contradicted / unknown
 [saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/proofwriter_pw_01.txt
 
 
-========== PROOFWRITER | pw_02 ==========
+PROOFWRITER | pw_02
 (expected: entailed)
 
 Logic-LM
@@ -56,7 +56,7 @@ Answer choices: entailed / contradicted / unknown
 
 
 
-========== PRO_ONTO_QA | pro_onto_qa_01 ==========
+PRO_ONTO_QA | pro_onto_qa_01
 (expected: true)
 
 Logic-LM
@@ -94,7 +94,7 @@ Query:
 [saved] /Users/nyee/projects/school/aiea/aiea_auditor_tasks/task5/outputs/pro_onto_qa_pro_onto_qa_01.txt
 
 
-========== PRO_ONTO_QA | pro_onto_qa_02 ==========
+PRO_ONTO_QA | pro_onto_qa_02
 (expected: true)
 
 Logic-LM
@@ -133,7 +133,7 @@ Query:
 
 
 
-========== FOLIO | folio_01 ==========
+FOLIO | folio_01
 
 Logic-LM
 
@@ -173,7 +173,7 @@ Conclusion:
 
 
 
-========== LOGICAL_DEDUCTION | logical_deduction_01 ==========
+LOGICAL_DEDUCTION | logical_deduction_01
 
 Logic-LM
 
@@ -213,7 +213,7 @@ Query:
 
 
 
-========== AR_LSAT | ar_lsat_01 ==========
+AR_LSAT | ar_lsat_01
 
 Logic-LM
 

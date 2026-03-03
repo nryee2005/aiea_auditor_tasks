@@ -1,5 +1,5 @@
 
-========== FOLIO | folio_01 ==========
+FOLIO | folio_01
 Logic-LM
 
 Task Description: Given a problem description and a question, parse the problem and question into first-order logic formulas.

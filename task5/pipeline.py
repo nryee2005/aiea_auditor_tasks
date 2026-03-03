@@ -6,7 +6,7 @@ import os
 import openai
 
 
-# --- LLM calls ---
+# LLM calls
 
 def call_llm(system_prompt, user_prompt):
     # Send a chat completion request to GPT
@@ -64,7 +64,7 @@ def translate_to_prolog(context, question, dataset=""):
     return strip_fences(raw)
 
 
-# --- Prolog execution ---
+# Prolog execution
 
 def run_prolog(program):
     # Write program to a temp file and run it with swipl
@@ -80,7 +80,7 @@ def run_prolog(program):
         stderr = result.stderr.strip()
         stdout = result.stdout.strip()
 
-        # swipl can return 0 even when directives fail, so check for ERROR in stderr
+        # swipl can return 0 even when directives fail -> check for ERROR in stderr
         has_error = "ERROR:" in stderr
         success = result.returncode == 0 and not has_error
 
@@ -90,10 +90,10 @@ def run_prolog(program):
     except subprocess.TimeoutExpired:
         return {"success": False, "stdout": "", "stderr": "Execution timed out (10s)"}
     finally:
-        os.unlink(tmp.name)
+        os.unlink(tmp.name) # cleanup tmp
 
 
-# --- Self-refinement ---
+# Self-refinement
 
 REFINE_PROMPT = """\
 You are an expert Prolog debugger. The user will give you:
@@ -122,7 +122,7 @@ def refine_prolog(program, error, context, question):
     return strip_fences(raw)
 
 
-# --- Answer comparison ---
+# Answer comparison
 
 def interpret_result(stdout, expected):
     # Compare prolog output against expected answer
@@ -143,7 +143,7 @@ def interpret_result(stdout, expected):
         if val in ("unknown", "neither"):
             return "unknown"
 
-        # Search for keywords in longer output (e.g. "Yes, alex is bright.")
+        # Search for keywords in longer output
         words = set(re.findall(r"[a-z]+", val))
         for w in ("entailed", "true", "yes"):
             if w in words:
@@ -163,7 +163,7 @@ def interpret_result(stdout, expected):
     }
 
 
-# --- Main pipeline for one problem ---
+# Main pipeline for one problem
 
 def run_pipeline_item(item, mod, dataset=""):
     # Import here to avoid circular import
@@ -203,7 +203,7 @@ def run_pipeline_item(item, mod, dataset=""):
         else:
             error_msg = "Program produced no output"
 
-        # Try to fix it (unless we're out of attempts)
+        # Try to fix it
         if attempt < max_attempts:
             program = refine_prolog(program, error_msg, context, question)
 

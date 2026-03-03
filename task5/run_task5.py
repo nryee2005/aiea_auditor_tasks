@@ -71,7 +71,7 @@ def run_kb_tests():
     print(result.stdout)
     print(f"Saved to {swipl_out}")
 
-    # Quick check that expected names show up
+    # Check that expected names show up
     for name in ["chris", "stewie", "meg"]:
         if name not in result.stdout:
             print(f"WARNING: '{name}' not found in output")
@@ -106,14 +106,14 @@ def run_all_prompts():
 tee = Tee(sys.stdout)
 sys.stdout = tee
 
-print("=== Task 5: KB Tests + Prompt Demo ===")
+print("Task 5: KB Tests + Prompt Demo")
 
-# 1) Run KB tests
+# Run KB tests
 rc = run_kb_tests()
 if rc != 0:
     print("KB tests failed")
 
-# 2) Run prompt formatting
+# Run prompt formatting
 run_all_prompts()
 
 print("\nDone.")

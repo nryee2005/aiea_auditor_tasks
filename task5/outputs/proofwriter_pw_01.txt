@@ -1,5 +1,5 @@
 
-========== PROOFWRITER | pw_01 ==========
+PROOFWRITER | pw_01
 (expected: unknown)
 Logic-LM
 

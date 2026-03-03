@@ -1,5 +1,5 @@
 
-========== PRO_ONTO_QA | pro_onto_qa_02 ==========
+PRO_ONTO_QA | pro_onto_qa_02
 (expected: true)
 Logic-LM
 
