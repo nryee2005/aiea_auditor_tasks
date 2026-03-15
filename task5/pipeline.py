@@ -3,23 +3,15 @@ import subprocess
 import tempfile
 import os
 
-import openai
+from langchain.chat_models import init_chat_model
+from langchain_core.messages import SystemMessage, HumanMessage
 
+model = init_chat_model("openai:gpt-3.5-turbo", temperature=0)
 
-# LLM calls
 
 def call_llm(system_prompt, user_prompt):
-    # Send a chat completion request to GPT
-    client = openai.OpenAI()
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        temperature=0,
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-    )
-    return response.choices[0].message.content.strip()
+    response = model.invoke([SystemMessage(system_prompt), HumanMessage(user_prompt)])
+    return response.content.strip()
 
 
 def strip_fences(raw):
